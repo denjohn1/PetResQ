@@ -10,13 +10,63 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState({
+    fullname: "",
+    email: "",
+    password: "",
+    terms: "",
+  });
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {
+      fullname: "",
+      email: "",
+      password: "",
+      terms: "",
+    };
+
+    // Fullname validation
+    if (!fullname.trim()) {
+      newErrors.fullname = "Full name is required";
+      valid = false;
+    } else if (fullname.trim().length < 3) {
+      newErrors.fullname = "Name must be at least 3 characters";
+      valid = false;
+    }
+
+    // Email validation
+    if (!email) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+      valid = false;
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+
+    // Terms validation
+    if (!termsAccepted) {
+      newErrors.terms = "You must accept the terms and policy";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
 
   const handleSignUp = () => {
-    // Handle sign-up logic here (e.g., API call)
-    if (termsAccepted) {
+    if (validateForm()) {
       console.log("Sign Up with:", fullname, email, password);
-    } else {
-      console.log("Please accept the terms and policy.");
+      // Proceed with registration logic
     }
   };
 
@@ -60,86 +110,155 @@ export default function RegisterScreen() {
       </Text>
 
       {/* Fullname Input */}
-      <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-4">
-        <Ionicons
-          name="person-outline"
-          size={20}
-          color="gray"
-          className="mr-3"
-        />
-        <TextInput
-          placeholder="Fullname"
-          value={fullname}
-          onChangeText={setFullname}
-          autoCapitalize="words"
-          className="flex-1 text-base"
-          style={{ fontFamily: "Poppins-Regular", textAlignVertical: "center" }}
-        />
+      <View className="mb-4">
+        <View className={`flex-row items-center bg-gray-100 rounded-lg px-4 py-3 ${errors.fullname ? "border border-red-500" : ""}`}>
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color="gray"
+            className="mr-3"
+          />
+          <TextInput
+            placeholder="Fullname"
+            value={fullname}
+            onChangeText={(text) => {
+              setFullname(text);
+              if (errors.fullname) {
+                setErrors({...errors, fullname: ""});
+              }
+            }}
+            autoCapitalize="words"
+            className="flex-1 text-base"
+            style={{
+              fontFamily: "Poppins-Regular",
+              height: 30,
+              padding: 0,
+              margin: 0,
+              includeFontPadding: false,
+              textAlignVertical: "center",
+            }}
+          />
+        </View>
+        {errors.fullname ? (
+          <Text className="text-red-500 text-xs mt-1 ml-1" style={{ fontFamily: "Poppins-Regular" }}>
+            {errors.fullname}
+          </Text>
+        ) : null}
       </View>
 
       {/* Email Input */}
-      <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-4">
-        <Ionicons
-          name="person-outline"
-          size={20}
-          color="gray"
-          className="mr-3"
-        />
-        <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          className="flex-1 text-base"
-          style={{ fontFamily: "Poppins-Regular", textAlignVertical: "center" }}
-        />
+      <View className="mb-4">
+        <View className={`flex-row items-center bg-gray-100 rounded-lg px-4 py-3 ${errors.email ? "border border-red-500" : ""}`}>
+          <Ionicons
+            name="mail-outline"
+            size={20}
+            color="gray"
+            className="mr-3"
+          />
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              if (errors.email) {
+                setErrors({...errors, email: ""});
+              }
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            className="flex-1 text-base"
+            style={{
+              fontFamily: "Poppins-Regular",
+              height: 30,
+              padding: 0,
+              margin: 0,
+              includeFontPadding: false,
+              textAlignVertical: "center",
+            }}
+          />
+        </View>
+        {errors.email ? (
+          <Text className="text-red-500 text-xs mt-1 ml-1" style={{ fontFamily: "Poppins-Regular" }}>
+            {errors.email}
+          </Text>
+        ) : null}
       </View>
 
       {/* Password Input */}
-      <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-4">
-        <Ionicons
-          name="lock-closed-outline"
-          size={20}
-          color="gray"
-          className="mr-3"
-        />
-        <TextInput
-          placeholder="Your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={!passwordVisible}
-          className="flex-1 text-base"
-          style={{ fontFamily: "Poppins-Regular", textAlignVertical: "center" }}
-        />
-        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+      <View className="mb-4">
+        <View className={`flex-row items-center bg-gray-100 rounded-lg px-4 py-3 ${errors.password ? "border border-red-500" : ""}`}>
           <Ionicons
-            name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+            name="lock-closed-outline"
             size={20}
             color="gray"
+            className="mr-3"
           />
-        </TouchableOpacity>
+          <TextInput
+            placeholder="Your password"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errors.password) {
+                setErrors({...errors, password: ""});
+              }
+            }}
+            secureTextEntry={!passwordVisible}
+            className="flex-1 text-base"
+            style={{
+              fontFamily: "Poppins-Regular",
+              height: 30,
+              padding: 0,
+              margin: 0,
+              includeFontPadding: false,
+              textAlignVertical: "center",
+            }}
+          />
+          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+            <Ionicons
+              name={passwordVisible ? "eye-outline" : "eye-off-outline"}
+              size={20}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
+        {errors.password ? (
+          <Text className="text-red-500 text-xs mt-1 ml-1" style={{ fontFamily: "Poppins-Regular" }}>
+            {errors.password}
+          </Text>
+        ) : null}
       </View>
 
       {/* Terms and Policy Checkbox */}
-      <TouchableOpacity
-        className="flex-row items-center mb-6"
-        onPress={() => setTermsAccepted(!termsAccepted)}
-      >
-        <Ionicons
-          name={termsAccepted ? "checkbox-outline" : "square-outline"}
-          size={20}
-          color={termsAccepted ? "black" : "gray"}
-          className="mr-2"
-        />
-        <Text
-          className="text-gray-500 text-sm"
-          style={{ fontFamily: "Poppins-Regular" }}
+      <View className="mb-6">
+        <TouchableOpacity
+          className="flex-row items-center"
+          onPress={() => {
+            setTermsAccepted(!termsAccepted);
+            if (errors.terms) {
+              setErrors({...errors, terms: ""});
+            }
+          }}
         >
-          By creating this account, you have agree with{" "}
-          <Text className="text-black">Terms and Policy</Text>
-        </Text>
-      </TouchableOpacity>
+          <Ionicons
+            name={termsAccepted ? "checkbox-outline" : "square-outline"}
+            size={20}
+            color={termsAccepted ? "black" : errors.terms ? "red" : "gray"}
+            className="mr-2"
+          />
+          <Text
+            className="text-gray-500 text-sm"
+            style={{ fontFamily: "Poppins-Regular" }}
+          >
+            By creating this account, you have agree with{" "}
+            <Text className="text-black">Terms and Policy</Text>
+          </Text>
+        </TouchableOpacity>
+        {errors.terms ? (
+          <Text className="text-red-500 text-xs mt-1 ml-7" style={{ fontFamily: "Poppins-Regular" }}>
+            {errors.terms}
+          </Text>
+        ) : null}
+      </View>
 
       {/* Sign Up Button */}
       <TouchableOpacity
@@ -167,4 +286,4 @@ export default function RegisterScreen() {
       </TouchableOpacity>
     </View>
   );
-}
+} 
