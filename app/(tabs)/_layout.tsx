@@ -1,45 +1,80 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import {
+  ChatBubbleOvalLeftEllipsisIcon,
+  Cog6ToothIcon,
+  HomeIcon,
+  MapIcon
+} from 'react-native-heroicons/outline';
+import {
+  ChatBubbleOvalLeftEllipsisIcon as ChatIconSolid,
+  Cog6ToothIcon as CogIconSolid,
+  HomeIcon as HomeIconSolid,
+  MapIcon as MapIconSolid
+} from 'react-native-heroicons/solid';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+      screenOptions={{  
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarActiveTintColor: '#FBAF02',
+        tabBarInactiveTintColor: '#262626',
+        tabBarStyle: {
+          backgroundColor: '#ffffff',
+          borderTopWidth: 1,
+          borderTopColor: '#e5e5e5',
+          height: 55,
+          paddingTop: 10,
+          paddingBottom: 10,
+        },
+        tabBarShowLabel: false,
+        tabBarIconStyle: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            focused ? 
+              <HomeIconSolid color={color} size={28} /> : 
+              <HomeIcon color={color} size={28} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="mapscreen"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            focused ? 
+              <MapIconSolid color={color} size={28} /> : 
+              <MapIcon color={color} size={28} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chatroomscreen"
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            focused ? 
+              <ChatIconSolid color={color} size={28} /> : 
+              <ChatBubbleOvalLeftEllipsisIcon color={color} size={28} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settingsscreen"
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            focused ? 
+              <CogIconSolid color={color} size={28} /> : 
+              <Cog6ToothIcon color={color} size={28} />
+          ),
         }}
       />
     </Tabs>
   );
-}
+} 
