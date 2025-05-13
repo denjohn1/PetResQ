@@ -1,14 +1,144 @@
 import { Feather } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Animated, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  Alert,
+  Animated,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { PlusIcon } from "react-native-heroicons/outline";
 import MapView, { Marker } from "react-native-maps";
+
+// Define the type for userLocation
+type LocationRegion = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
+// Define the type for dummy markers
+type DummyMarker = {
+  latitude: number;
+  longitude: number;
+  title: string;
+  description: string;
+  type: "Lost" | "Found";
+};
 
 export default function MapScreen() {
   const router = useRouter();
   const [fabOpen, setFabOpen] = useState(false);
-    const [animation] = useState(new Animated.Value(0));
+  const [animation] = useState(new Animated.Value(0));
+  const [userLocation, setUserLocation] = useState<LocationRegion | null>(null);
+
+  // Dummy coordinates for lost/found reports in Casiguran, Bacon, Gubat, and Irosin, on land
+  const dummyMarkers: DummyMarker[] = [
+    {
+      latitude: 12.8740,
+      longitude: 124.0090,
+      title: "Lost Item",
+      description: "Lost wallet in Casiguran Town Center",
+      type: "Lost",
+    },
+    {
+      latitude: 12.8650,
+      longitude: 124.0150,
+      title: "Found Item",
+      description: "Found keys in Barangay Boton, Casiguran",
+      type: "Found",
+    },
+    {
+      latitude: 13.0370,
+      longitude: 124.0400,
+      title: "Lost Item",
+      description: "Lost phone in Bacon Poblacion",
+      type: "Lost",
+    },
+    {
+      latitude: 13.0100,
+      longitude: 124.0250,
+      title: "Found Item",
+      description: "Found bag in Barangay San Roque, Bacon",
+      type: "Found",
+    },
+    {
+      latitude: 12.9170,
+      longitude: 124.1230,
+      title: "Lost Item",
+      description: "Lost watch in Gubat Town Center",
+      type: "Lost",
+    },
+    {
+      latitude: 12.9050,
+      longitude: 124.1350,
+      title: "Found Item",
+      description: "Found sunglasses at Rizal Beach, Gubat",
+      type: "Found",
+    },
+    {
+      latitude: 12.7030,
+      longitude: 124.0350,
+      title: "Lost Item",
+      description: "Lost laptop in Irosin Town Center",
+      type: "Lost",
+    },
+    {
+      latitude: 12.7100,
+      longitude: 124.0400,
+      title: "Found Item",
+      description: "Found book in Barangay San Juan, Irosin",
+      type: "Found",
+    },
+    {
+      latitude: 12.8760,
+      longitude: 124.0070,
+      title: "Lost Item",
+      description: "Lost ring in Barangay Adovis, Casiguran",
+      type: "Lost",
+    },
+    {
+      latitude: 12.9200,
+      longitude: 124.1100,
+      title: "Found Item",
+      description: "Found jacket in Barangay Manapao, Gubat",
+      type: "Found",
+    },
+  ];
+
+  // Request location permissions and get user's location
+  useEffect(() => {
+    (async () => {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            "Permission Denied",
+            "Location permission is required to show your current location.",
+            [{ text: "OK" }]
+          );
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.2,
+        });
+      } catch (error) {
+        console.error("Error getting location:", error);
+        Alert.alert("Error", "Unable to fetch location. Please try again.");
+      }
+    })();
+  }, []);
 
   const toggleFab = () => {
     if (fabOpen) {
@@ -26,6 +156,7 @@ export default function MapScreen() {
     }
     setFabOpen(!fabOpen);
   };
+
   const handleReportLost = () => {
     console.log("ReportLost Screen");
     router.push("/(screens)/reportlostscreen");
@@ -60,19 +191,43 @@ export default function MapScreen() {
       <MapView
         style={{ flex: 1, width: "100%", height: "100%" }}
         className="flex-1"
-        initialRegion={{
-          latitude: 13.0159953,
-          longitude: 124.0252265,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
+        region={
+          userLocation || {
+            latitude: 12.9700,
+            longitude: 124.0050,
+            latitudeDelta: 0.2,
+            longitudeDelta: 0.2,
+          }
+        }
+        showsUserLocation={true}
         onMapReady={() => console.log("Map is ready")}
       >
-        <Marker
-          coordinate={{ latitude: 13.0159953, longitude: 124.0252265 }}
-          title="Lost Pet"
-          description="Last seen here"
-        />
+        {/* User's Location Marker */}
+        {userLocation && (
+          <Marker
+            coordinate={{
+              latitude: userLocation.latitude,
+              longitude: userLocation.longitude,
+            }}
+            title="Your Location"
+            description="You are here"
+            pinColor="blue"
+          />
+        )}
+
+        {/* Dummy Lost/Found Markers */}
+        {dummyMarkers.map((marker, index) => (
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude,
+            }}
+            title={marker.title}
+            description={marker.description}
+            pinColor={marker.type === "Lost" ? "red" : "green"}
+          />
+        ))}
       </MapView>
 
       {/* FAB Button */}
