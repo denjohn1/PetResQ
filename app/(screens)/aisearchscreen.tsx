@@ -2,11 +2,11 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    SafeAreaView,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function AISearchScreen() {
@@ -50,7 +50,15 @@ export default function AISearchScreen() {
   const handleStartSearch = () => {
     const selectedPet = pets.find((pet) => pet.selected);
     if (selectedPet) {
-      router.push("/(screens)/aimapscreen");
+      router.push({
+        pathname: "/(screens)/aimapscreen",
+        params: {
+          name: selectedPet.name,
+          breed: selectedPet.breed,
+          behavior: selectedPet.behavior,
+          lastSeen: selectedPet.lastSeen,
+        },
+      });
     }
   };
 
@@ -102,8 +110,7 @@ export default function AISearchScreen() {
               className={`mb-4 p-4 rounded-lg border relative ${
                 pet.selected ? "border-amber-500" : "border-gray-200"
               }`}
-            >
-              {/* Checkmark positioned absolutely in bottom-right corner */}
+            > 
               {pet.selected && (
                 <View className="absolute bottom-3 right-3 bg-green-500 rounded-full p-1 z-10">
                   <Feather name="check" size={14} color="white" />
@@ -155,8 +162,7 @@ export default function AISearchScreen() {
           ))}
         </ScrollView>
       </View>
-
-      {/* Fixed Bottom Button */}
+          
       <View className="absolute bottom-0 left-0 right-0 px-4 py-4 bg-white">
         <TouchableOpacity
           onPress={handleStartSearch}
@@ -173,4 +179,4 @@ export default function AISearchScreen() {
       </View>
     </SafeAreaView>
   );
-}
+} 
